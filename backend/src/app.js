@@ -11,11 +11,13 @@ const setupSwagger = require('./swagger');
 
 const app = express();
 
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
 // 1. Core Security & Body Parser Middlewares
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 setupSwagger(app);
 app.use(helmet()); // HTTP headers ደህንነት መጠበቅ እና X-Powered-By መደበቅ
-app.use(cors());   // Cross-Origin Requests ለመፍቀድ
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:4173', credentials: true }));
 
 // 2. Rate Limiting (ከ Routes በፊት)
 const limiter = rateLimit({
